@@ -1,45 +1,64 @@
-hive1.x的derby模式
+#### hive1.x的derby模式
 
 1 . 解压
 
+```shell
 $ tar -zxvf apache-hive-1.2.1-bin.tar.gz  -C /home/hzy/app/
+
+```
+
 2 .配置环境
 
+```shell
 #set hive env
 export HIVE_HOME=/home/hzy/app/apache-hive-1.2.1-bin
 export PATH=${HIVE_HOME}/bin:$PATH
-3 . 本地derby模式的hive-site.xml[创建一个空文件，添加如下配置即可]
 
-<configuration>  
-  
-<property>  
-  <name>javax.jdo.option.ConnectionURL</name>  
-  <value>jdbc:derby:;databaseName=metastore_db;create=true</value>  
-</property>  
-   
-<property>  
-  <name>javax.jdo.option.ConnectionDriverName</name>  
-  <value>org.apache.derby.jdbc.EmbeddedDriver</value>  
-</property>  
-   
+```
+
+3 . 本地derby模式的`hive-site.xml`[创建一个空文件，添加如下配置即可]
+
+```xml
+<configuration>  
+  
+<property>  
+  <name>javax.jdo.option.ConnectionURL</name>  
+  <value>jdbc:derby:;databaseName=metastore_db;create=true</value>  
+</property>  
+   
+<property>  
+  <name>javax.jdo.option.ConnectionDriverName</name>  
+  <value>org.apache.derby.jdbc.EmbeddedDriver</value>  
+</property>  
+   
 # 在0.10  0.11或者之后的HIVE版本 hive.metastore.local 属性不再使用。
 # 否则会出现警告： WARN conf.HiveConf: HiveConf of name hive.metastore.local does not exist  
-<property>  
-  <name>hive.metastore.local</name>    
-  <value>true</value>  
-</property>  
-   
-<property>  
-  <name>hive.metastore.warehouse.dir</name>  
-  <value>/user/hive/warehouse</value>  
-</property>  
+<property>  
+  <name>hive.metastore.local</name>    
+  <value>true</value>  
+</property>  
+   
+<property>  
+  <name>hive.metastore.warehouse.dir</name>  
+  <value>/user/hive/warehouse</value>  
+</property>  
 </configuration>
+```
+
+
+
 4 . 本地模式可在一个空目录直接hive启动[hive1.x的derby模式似乎可不需要要配置hive-site.xml]
 
+```shell
 $ mkdir hive && cd hive 
 $ hive 
-derby模式下部署时遇到的问题
+```
 
+
+
+##### derby模式下部署时遇到的问题
+
+```shell
 # 问题一
 Logging initialized using configuration in jar:file:/home/hzy/app/apache-hive-1.2.1-bin/lib/hive-common-1.2.1.jar!/hive-log4j.properties
 [ERROR] Terminal initialization failed; falling back to unsupported
