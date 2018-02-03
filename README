@@ -1,0 +1,79 @@
+hive1.x的derby模式
+
+1 . 解压
+
+$ tar -zxvf apache-hive-1.2.1-bin.tar.gz  -C /home/hzy/app/
+2 .配置环境
+
+#set hive env
+export HIVE_HOME=/home/hzy/app/apache-hive-1.2.1-bin
+export PATH=${HIVE_HOME}/bin:$PATH
+3 . 本地derby模式的hive-site.xml[创建一个空文件，添加如下配置即可]
+
+<configuration>  
+  
+<property>  
+  <name>javax.jdo.option.ConnectionURL</name>  
+  <value>jdbc:derby:;databaseName=metastore_db;create=true</value>  
+</property>  
+   
+<property>  
+  <name>javax.jdo.option.ConnectionDriverName</name>  
+  <value>org.apache.derby.jdbc.EmbeddedDriver</value>  
+</property>  
+   
+# 在0.10  0.11或者之后的HIVE版本 hive.metastore.local 属性不再使用。
+# 否则会出现警告： WARN conf.HiveConf: HiveConf of name hive.metastore.local does not exist  
+<property>  
+  <name>hive.metastore.local</name>    
+  <value>true</value>  
+</property>  
+   
+<property>  
+  <name>hive.metastore.warehouse.dir</name>  
+  <value>/user/hive/warehouse</value>  
+</property>  
+</configuration>
+4 . 本地模式可在一个空目录直接hive启动[hive1.x的derby模式似乎可不需要要配置hive-site.xml]
+
+$ mkdir hive && cd hive 
+$ hive 
+derby模式下部署时遇到的问题
+
+# 问题一
+Logging initialized using configuration in jar:file:/home/hzy/app/apache-hive-1.2.1-bin/lib/hive-common-1.2.1.jar!/hive-log4j.properties
+[ERROR] Terminal initialization failed; falling back to unsupported
+java.lang.IncompatibleClassChangeError: Found class jline.Terminal, but interface was expected
+	at jline.TerminalFactory.create(TerminalFactory.java:101)
+	at jline.TerminalFactory.get(TerminalFactory.java:158)
+	at jline.console.ConsoleReader.<init>(ConsoleReader.java:229)
+	at jline.console.ConsoleReader.<init>(ConsoleReader.java:221)
+	at jline.console.ConsoleReader.<init>(ConsoleReader.java:209)
+	at org.apache.hadoop.hive.cli.CliDriver.setupConsoleReader(CliDriver.java:787)
+	at org.apache.hadoop.hive.cli.CliDriver.executeDriver(CliDriver.java:721)
+	at org.apache.hadoop.hive.cli.CliDriver.run(CliDriver.java:681)
+	at org.apache.hadoop.hive.cli.CliDriver.main(CliDriver.java:621)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.hadoop.util.RunJar.run(RunJar.java:221)
+	at org.apache.hadoop.util.RunJar.main(RunJar.java:136)
+
+Exception in thread "main" java.lang.IncompatibleClassChangeError: Found class jline.Terminal, but interface was expected
+	at jline.console.ConsoleReader.<init>(ConsoleReader.java:230)
+	at jline.console.ConsoleReader.<init>(ConsoleReader.java:221)
+	at jline.console.ConsoleReader.<init>(ConsoleReader.java:209)
+	at org.apache.hadoop.hive.cli.CliDriver.setupConsoleReader(CliDriver.java:787)
+	at org.apache.hadoop.hive.cli.CliDriver.executeDriver(CliDriver.java:721)
+	at org.apache.hadoop.hive.cli.CliDriver.run(CliDriver.java:681)
+	at org.apache.hadoop.hive.cli.CliDriver.main(CliDriver.java:621)
+	at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:62)
+	at sun.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.lang.reflect.Method.invoke(Method.java:498)
+	at org.apache.hadoop.util.RunJar.run(RunJar.java:221)
+	at org.apache.hadoop.util.RunJar.main(RunJar.java:136)
+
+# 解决方案[删除$HADOOP_HOME/share/hadoop/yarn/lib/jline-0.9.94.jar]
+$ sudo mv  /home/hzy/app/hadoop-2.6.2/share/hadoop/yarn/lib/jline-0.9.94.jar  ~
